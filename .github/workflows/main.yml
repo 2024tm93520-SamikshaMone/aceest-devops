@@ -1,1 +1,59 @@
+name: ACEest CI/CD Pipeline
 
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # Step 1 - get the latest code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2 - set up Python
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      # Step 3 - install all dependencies
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install flake8
+
+      # Step 4 - lint: catch syntax errors before wasting time on tests
+      # --select=E9,F63,F7,F82 means only hard-fail on real errors
+      # things like long lines are warnings only (--exit-zero)
+      - name: Lint with flake8
+        run: |
+          flake8 app.py --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 app.py --count --max-line-length=100 --statistics --exit-zero
+
+      # Step 5 - run the full pytest suite on the host
+      - name: Run unit tests
+        run: |
+          python -m pytest tests/ -v --tb=short
+
+      # Step 6 - build the Docker image
+      - name: Build Docker image
+        run: |
+          docker build -t aceest-fitness:latest .
+
+      # Step 7 - run pytest inside the container
+      # this confirms the app works in a containerized environment too
+      # not just on the GitHub Actions runner
+      - name: Run tests inside Docker container
+        run: |
+          docker run --rm \
+            --workdir /app \
+            -e DB_PATH=/tmp/aceest_test.db \
+            aceest-fitness:latest \
+            python -m pytest tests/ -v --tb=short
