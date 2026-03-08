@@ -1,1 +1,24 @@
+# Python cache files - not needed in container
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
 
+# Database files - container creates its own fresh DB
+*.db
+
+# Git folder - no version control needed inside image
+.git/
+.gitignore
+
+# Local env files
+.env
+
+# Docs and markdown - not needed to run the app
+*.md
+docs/
+
+# Test results and coverage reports
+.pytest_cache/
+htmlcov/
+.coverage
