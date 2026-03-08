@@ -1,1 +1,35 @@
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
 
+# Database files - each environment creates its own
+*.db
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# Environment variables - never commit secrets
+.env
+
+# Test output and coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.iml
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
